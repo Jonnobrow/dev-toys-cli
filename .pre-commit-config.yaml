@@ -1,0 +1,17 @@
+---
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.1.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-merge-conflict
+  - repo: https://github.com/TekWizely/pre-commit-golang
+    rev: v1.0.0-beta.5
+    hooks:
+      - id: go-build-mod
+      - id: go-fmt
+      - id: go-mod-tidy
+      - id: go-test-mod
+      - id: go-vet-mod
