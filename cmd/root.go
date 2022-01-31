@@ -1,8 +1,9 @@
 package cmd
 
 import (
-	"fmt"
+	"os"
 
+	"github.com/jonnobrow/dev-toys-cli/internal/toys"
 	"github.com/spf13/cobra"
 )
 
@@ -10,7 +11,10 @@ var rootCmd = &cobra.Command{
 	Use:   "dev-toys-cli",
 	Short: "A swiss army knife for developers",
 	Run: func(cmd *cobra.Command, _ []string) {
-		fmt.Printf("Welcome to DevToysCLI")
+		err := toys.Run()
+		if err != nil {
+			os.Exit(1)
+		}
 	},
 }
 
