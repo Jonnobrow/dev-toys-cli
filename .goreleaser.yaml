@@ -5,7 +5,7 @@ before:
     - go mod tidy
     - go test ./...
 builds:
-  - main: ./cmd/dev-toys
+  - main: .
     env:
       - CGO_ENABLED=0
     goos:
