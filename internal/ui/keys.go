@@ -12,6 +12,7 @@ type keyMap struct {
 	Quit   key.Binding
 	Toggle key.Binding
 	Yank   key.Binding
+	Pipe   key.Binding
 }
 
 func (k keyMap) ShortHelp() []key.Binding {
@@ -21,7 +22,7 @@ func (k keyMap) ShortHelp() []key.Binding {
 func (k keyMap) FullHelp() [][]key.Binding {
 	return [][]key.Binding{
 		{k.Up, k.Down, k.Left, k.Right},
-		{k.Select, k.Toggle, k.Yank},
+		{k.Select, k.Toggle, k.Yank, k.Pipe},
 		{k.Help, k.Quit},
 	}
 }
@@ -54,6 +55,10 @@ var keys = keyMap{
 	Yank: key.NewBinding(
 		key.WithKeys("y", "Y"),
 		key.WithHelp("y/Y", "yank output to clipboard"),
+	),
+	Pipe: key.NewBinding(
+		key.WithKeys("|"),
+		key.WithHelp("|", "pipe output to stdout and exit"),
 	),
 	Help: key.NewBinding(
 		key.WithKeys("?"),
