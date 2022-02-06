@@ -45,6 +45,11 @@ func NewModel() Model {
 				"Converters", "Convert Stuff",
 				commands.Converters()...,
 			),
+			// Formatters
+			commands.NewCategory(
+				"Formatters", "Format Stuff",
+				commands.Formatters()...,
+			),
 		},
 		inCategory: false,
 	}

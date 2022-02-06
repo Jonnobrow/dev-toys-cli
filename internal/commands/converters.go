@@ -1,8 +1,6 @@
 package commands
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"strconv"
 
@@ -92,14 +90,6 @@ func convertNumberBase(input string, fromBase int, toBase int) (string, error) {
 	}
 
 	return strconv.FormatInt(inputInt, toBase), nil
-}
-
-func prettyJson(rawJSON string) (string, error) {
-	var prettyJSON bytes.Buffer
-	if err := json.Indent(&prettyJSON, []byte(rawJSON), "", "  "); err != nil {
-		return "", err
-	}
-	return prettyJSON.String(), nil
 }
 
 func displayBasedNumber(input string, base int) string {
