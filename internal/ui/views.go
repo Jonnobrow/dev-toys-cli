@@ -71,7 +71,11 @@ func (m Model) subcommandsView() string {
 	for i, command := range category.Subcommands {
 		v := listTitleStyle.Render(command.Name())
 		if i == category.Cursor {
-			v = fmt.Sprintf("%s\n%s\n", v, m.inputOutputView())
+			if category.Selected().ShouldDisplayInput() {
+				v = fmt.Sprintf("%s\n%s\n", v, m.inputOutputView())
+			} else {
+				v = fmt.Sprintf("%s\n%s\n", v, m.outputView())
+			}
 			subcommands = append(subcommands, listSelectedStyle.Render(v))
 		} else {
 			subcommands = append(subcommands, listItemStyle.Render(v))
@@ -96,4 +100,14 @@ func (m Model) inputOutputView() string {
 	}
 	output = lipgloss.NewStyle().MaxHeight(20).Render(wrap.String(subcommand.DisplayOutput(result), availWidth/2))
 	return lipgloss.JoinHorizontal(lipgloss.Left, input, " to ", output)
+}
+
+func (m Model) outputView() string {
+	category := m.categories[m.cursor]
+	subcommand := category.Selected()
+	result, err := subcommand.Exec(m.getInput())
+	if err != nil {
+		return "Error running command"
+	}
+	return lipgloss.NewStyle().MaxHeight(20).Render(wrap.String(subcommand.DisplayOutput(result), m.width))
 }
