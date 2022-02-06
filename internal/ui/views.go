@@ -26,6 +26,10 @@ func (m Model) statusView() string {
 		statusComponents = append(statusComponents, fmt.Sprintf("Using stdin as input"))
 	}
 
+	if m.Result.Command() != "" && m.Result.Out() != "" {
+		statusComponents = append(statusComponents, fmt.Sprintf("Last command: %s", m.Result.Command()))
+	}
+
 	return strings.Join(statusComponents, " | ")
 }
 
@@ -88,23 +92,24 @@ func (m Model) subcommandsView() string {
 func (m Model) inputOutputView() string {
 	category := m.categories[m.cursor]
 	subcommand := category.Selected()
+	if !m.Result.IsFromCommand(subcommand) {
+		return "Select to Run Command"
+	}
 
-	delimeter := " to "
+	delimeter := lipgloss.NewStyle().Bold(true).Render(" to ")
 	availWidth := m.width - lipgloss.Width(delimeter)
 
 	input := lipgloss.NewStyle().MaxHeight(20).Render(wrap.String(subcommand.DisplayInput(m.getInput()), availWidth/2))
-	result, err := subcommand.Exec(m.getInput())
-	var output string
-	if err != nil {
-		output = "Error running command"
-	}
-	output = lipgloss.NewStyle().MaxHeight(20).Render(wrap.String(subcommand.DisplayOutput(result), availWidth/2))
+	output := lipgloss.NewStyle().MaxHeight(20).Render(wrap.String(subcommand.DisplayOutput(m.Result.Out()), availWidth/2))
 	return lipgloss.JoinHorizontal(lipgloss.Left, input, " to ", output)
 }
 
 func (m Model) outputView() string {
 	category := m.categories[m.cursor]
 	subcommand := category.Selected()
+	if !m.Result.IsFromCommand(subcommand) {
+		return "Select to Run Command"
+	}
 	result, err := subcommand.Exec(m.getInput())
 	if err != nil {
 		return "Error running command"
