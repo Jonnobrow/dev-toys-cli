@@ -50,6 +50,11 @@ func NewModel() Model {
 				"Formatters", "Format Stuff",
 				commands.Formatters()...,
 			),
+			// Generators
+			commands.NewCategory(
+				"Generators", "Generate Stuff",
+				commands.Generators()...,
+			),
 		},
 		inCategory: false,
 	}
