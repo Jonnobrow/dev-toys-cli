@@ -7,7 +7,7 @@ type Category struct {
 	Cursor      int
 }
 
-func NewCategory(title, prompt string, subcommands []Command) *Category {
+func NewCategory(title, prompt string, subcommands ...Command) *Category {
 	return &Category{
 		Title:       title,
 		Prompt:      prompt,

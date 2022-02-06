@@ -40,13 +40,8 @@ func NewModel() model {
 		categories: []*commands.Category{
 			// Converters
 			commands.NewCategory(
-				"Converters", "Convert Stuff", []commands.Command{
-					commands.JSONtoYAML, commands.YAMLtoJSON,
-				},
-			),
-			// ...
-			commands.NewCategory(
-				"Encoding", "Encode and Decode Stuff", []commands.Command{},
+				"Converters", "Convert Stuff",
+				commands.Converters()...,
 			),
 		},
 		inCategory: false,
