@@ -11,12 +11,13 @@ import (
 	"github.com/jonnobrow/dev-toys-cli/internal/helpers"
 )
 
-type model struct {
+type Model struct {
 	// Keymap and Help
 	keys keyMap
 	help help.Model
 	// Result of last operation
-	result string
+	Result        string
+	WriteToStdout bool
 	// Notification
 	notification string
 	// Current view title
@@ -29,10 +30,11 @@ type model struct {
 	width      int
 	inCategory bool
 	clipboard  bool
+	stdin      string
 }
 
-func NewModel() model {
-	return model{
+func NewModel() Model {
+	return Model{
 		keys:     keys,
 		help:     help.New(),
 		title:    "dev-toys-cli",
@@ -48,12 +50,16 @@ func NewModel() model {
 	}
 }
 
-func (m model) Init() tea.Cmd {
-	return nil
+func (m Model) Init() tea.Cmd {
+	return helpers.ReadFromStdin
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
+	case helpers.StdinMsg:
+		m.stdin = string(msg)
+	case helpers.ErrorMsg:
+		m.notification = fmt.Sprintf("Error: %v", msg.Error())
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		m.help.Width = msg.Width
@@ -79,18 +85,21 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.notification = fmt.Sprintf("Error: %s", err.Error())
 				} else {
 					m.notification = "Success"
-					m.result = res
+					m.Result = res
 				}
 			}
 		case key.Matches(msg, m.keys.Toggle):
 			m.clipboard = !m.clipboard
 		case key.Matches(msg, m.keys.Yank):
-			err := helpers.WriteToClipboard(m.result)
+			err := helpers.WriteToClipboard(m.Result)
 			if err != nil {
 				m.notification = "Failed to copy to clipboard"
 			} else {
 				m.notification = "Copied output to clipboard"
 			}
+		case key.Matches(msg, m.keys.Pipe):
+			m.WriteToStdout = true
+			return m, tea.Quit
 		case key.Matches(msg, m.keys.Help):
 			m.help.ShowAll = !m.help.ShowAll
 		case key.Matches(msg, m.keys.Quit):
@@ -100,7 +109,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m model) View() string {
+func (m Model) View() string {
 	var sections []string
 
 	sections = append(sections, m.headerView())
@@ -116,7 +125,7 @@ func (m model) View() string {
 	return appStyle.Render(lipgloss.JoinVertical(lipgloss.Left, sections...))
 }
 
-func (m *model) goUp() {
+func (m *Model) goUp() {
 	if m.inCategory {
 		category := m.categories[m.cursor]
 		category.CursorUp()
@@ -127,7 +136,7 @@ func (m *model) goUp() {
 	}
 }
 
-func (m *model) goDown() {
+func (m *Model) goDown() {
 	if m.inCategory {
 		category := m.categories[m.cursor]
 		category.CursorDown()
@@ -138,7 +147,7 @@ func (m *model) goDown() {
 	}
 }
 
-func (m *model) getInput() string {
+func (m *Model) getInput() string {
 	if m.clipboard {
 		res, err := helpers.ReadFromClipboard()
 		if err != nil {
@@ -147,11 +156,6 @@ func (m *model) getInput() string {
 		}
 		return res
 	} else {
-		res, err := helpers.ReadFromStdin()
-		if err != nil {
-			m.notification = err.Error()
-			return ""
-		}
-		return res
+		return m.stdin
 	}
 }

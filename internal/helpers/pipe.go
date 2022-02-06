@@ -5,16 +5,26 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	tea "github.com/charmbracelet/bubbletea"
 )
 
-func ReadFromStdin() (string, error) {
+type StdinMsg string
+
+type ErrorMsg struct{ err error }
+
+func (e ErrorMsg) Error() string {
+	return e.err.Error()
+}
+
+func ReadFromStdin() tea.Msg {
 	info, err := os.Stdin.Stat()
 	if err != nil {
-		return "", err
+		return ErrorMsg{err}
 	}
-
 	if info.Mode()&os.ModeCharDevice == os.ModeCharDevice {
-		return "", fmt.Errorf("Invalid input device for stdin")
+		// No stdin available - not an error state thought
+		return StdinMsg("")
 	}
 
 	scanner := bufio.NewScanner(os.Stdin)
@@ -25,27 +35,8 @@ func ReadFromStdin() (string, error) {
 	}
 
 	if scanner.Err() != nil {
-		return "", fmt.Errorf("Failed to read data from stdin: %v\n", err)
+		return ErrorMsg{fmt.Errorf("Failed to read data from stdin: %v\n", err)}
 	}
 
-	return strings.Join(output, "\n"), nil
-}
-
-func WriteToStdout(data string) error {
-	info, err := os.Stdout.Stat()
-	if err != nil {
-		return err
-	}
-
-	if info.Mode()&os.ModeCharDevice == os.ModeCharDevice {
-		return fmt.Errorf("Invalid input device for stdin")
-	}
-
-	writer := bufio.NewWriter(os.Stdout)
-	_, err = writer.WriteString(data)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return StdinMsg(strings.Join(output, "\n"))
 }

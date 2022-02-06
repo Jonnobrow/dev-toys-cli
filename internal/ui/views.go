@@ -8,11 +8,11 @@ import (
 	"github.com/muesli/reflow/wrap"
 )
 
-func (m model) titleView() string {
+func (m Model) titleView() string {
 	return lipgloss.JoinHorizontal(lipgloss.Center, titleStyle.Render(m.title), subtitleStyle.Render(m.subtitle))
 }
 
-func (m model) statusView() string {
+func (m Model) statusView() string {
 
 	var statusComponents []string
 
@@ -29,7 +29,7 @@ func (m model) statusView() string {
 	return strings.Join(statusComponents, " | ")
 }
 
-func (m model) headerView() string {
+func (m Model) headerView() string {
 	availWidth := m.width
 	title := m.titleView()
 	availWidth -= lipgloss.Width(title)
@@ -48,7 +48,7 @@ func (m model) headerView() string {
 		lipgloss.PlaceHorizontal(m.width, lipgloss.Left, v))
 }
 
-func (m model) categoriesView() string {
+func (m Model) categoriesView() string {
 
 	var categories []string
 
@@ -64,7 +64,7 @@ func (m model) categoriesView() string {
 	return lipgloss.JoinVertical(lipgloss.Left, categories...)
 }
 
-func (m model) subcommandsView() string {
+func (m Model) subcommandsView() string {
 	category := m.categories[m.cursor]
 	var subcommands []string
 
@@ -81,7 +81,7 @@ func (m model) subcommandsView() string {
 	return lipgloss.JoinVertical(lipgloss.Left, subcommands...)
 }
 
-func (m model) inputOutputView() string {
+func (m Model) inputOutputView() string {
 	category := m.categories[m.cursor]
 	subcommand := category.Selected()
 

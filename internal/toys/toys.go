@@ -8,10 +8,13 @@ import (
 )
 
 func Run() error {
-	program := tea.NewProgram(ui.NewModel(), tea.WithAltScreen(), tea.WithMouseCellMotion())
-	if err := program.Start(); err != nil {
-		fmt.Printf("Oops, something went wrong: %v", err)
+	program := tea.NewProgram(ui.NewModel(), tea.WithAltScreen())
+	if m, err := program.StartReturningModel(); err != nil {
 		return err
+	} else {
+		if m, ok := m.(ui.Model); ok && m.WriteToStdout {
+			fmt.Println(m.Result)
+		}
 	}
 	return nil
 }

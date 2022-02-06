@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/jonnobrow/dev-toys-cli/internal/toys"
@@ -13,6 +14,7 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, _ []string) {
 		err := toys.Run()
 		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error running: %v", err)
 			os.Exit(1)
 		}
 	},
