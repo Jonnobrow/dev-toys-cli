@@ -20,10 +20,6 @@ type jsonToYaml struct {
 	base
 }
 
-func (c jsonToYaml) Name() string {
-	return c.name
-}
-
 func (c jsonToYaml) Exec(rawJSON string) (string, error) {
 	yaml, err := yaml.JSONToYAML([]byte(rawJSON))
 	if err != nil {
@@ -34,10 +30,6 @@ func (c jsonToYaml) Exec(rawJSON string) (string, error) {
 
 type yamlToJson struct {
 	base
-}
-
-func (c yamlToJson) Name() string {
-	return c.name
 }
 
 func (c yamlToJson) Exec(rawYAML string) (string, error) {

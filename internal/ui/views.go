@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
+	"github.com/muesli/reflow/wrap"
 )
 
 func (m model) titleView() string {
@@ -68,8 +69,9 @@ func (m model) subcommandsView() string {
 	var subcommands []string
 
 	for i, command := range category.Subcommands {
-		v := fmt.Sprintf("%s", listTitleStyle.Render(command.Name()))
+		v := listTitleStyle.Render(command.Name())
 		if i == category.Cursor {
+			v = fmt.Sprintf("%s\n%s\n", v, m.inputOutputView())
 			subcommands = append(subcommands, listSelectedStyle.Render(v))
 		} else {
 			subcommands = append(subcommands, listItemStyle.Render(v))
@@ -77,4 +79,21 @@ func (m model) subcommandsView() string {
 	}
 
 	return lipgloss.JoinVertical(lipgloss.Left, subcommands...)
+}
+
+func (m model) inputOutputView() string {
+	category := m.categories[m.cursor]
+	subcommand := category.Selected()
+
+	delimeter := " to "
+	availWidth := m.width - lipgloss.Width(delimeter)
+
+	input := lipgloss.NewStyle().MaxHeight(20).Render(wrap.String(subcommand.DisplayInput(m.getInput()), availWidth/2))
+	result, err := subcommand.Exec(m.getInput())
+	var output string
+	if err != nil {
+		output = "Error running command"
+	}
+	output = lipgloss.NewStyle().MaxHeight(20).Render(wrap.String(subcommand.DisplayOutput(result), availWidth/2))
+	return lipgloss.JoinHorizontal(lipgloss.Left, input, " to ", output)
 }
