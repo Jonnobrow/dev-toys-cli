@@ -9,7 +9,9 @@ import (
 	"encoding/hex"
 	"hash"
 	"math/big"
+	"strings"
 
+	"github.com/bxcodec/faker/v3"
 	"github.com/google/uuid"
 )
 
@@ -67,6 +69,19 @@ var (
 			zero: true,
 		})
 
+		commands = append(commands, lipsumGenerator{
+			base:       NewBase("Lipsum - 1 Paragraph", "").withoutInputDisplay(),
+			paragraphs: 1,
+		})
+		commands = append(commands, lipsumGenerator{
+			base:       NewBase("Lipsum - 2 Paragraphs", "").withoutInputDisplay(),
+			paragraphs: 2,
+		})
+		commands = append(commands, lipsumGenerator{
+			base:       NewBase("Lipsum - 3 Paragraphs", "").withoutInputDisplay(),
+			paragraphs: 3,
+		})
+
 		return commands
 	}
 )
@@ -120,4 +135,19 @@ func (g uuidGenerator) Exec(string) (string, error) {
 		res, err := uuid.NewUUID()
 		return res.String(), err
 	}
+}
+
+type lipsumGenerator struct {
+	base
+	paragraphs int
+}
+
+func (g lipsumGenerator) Exec(string) (string, error) {
+	var lipsum []string
+
+	for p := 0; p < g.paragraphs; p++ {
+		lipsum = append(lipsum, faker.Paragraph())
+	}
+
+	return strings.Join(lipsum, "\n\n"), nil
 }
