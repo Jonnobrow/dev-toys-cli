@@ -9,6 +9,10 @@ import (
 	"encoding/hex"
 	"hash"
 	"math/big"
+	"strings"
+
+	"github.com/bxcodec/faker/v3"
+	"github.com/google/uuid"
 )
 
 var (
@@ -50,6 +54,34 @@ var (
 			length: 64,
 		})
 
+		commands = append(commands, uuidGenerator{
+			base:   NewBase("UUID v1", "date-time and mac address").withoutInputDisplay(),
+			random: false,
+		})
+
+		commands = append(commands, uuidGenerator{
+			base:   NewBase("UUID v4", "randoms").withoutInputDisplay(),
+			random: false,
+		})
+
+		commands = append(commands, uuidGenerator{
+			base: NewBase("Nil UUID", "zero").withoutInputDisplay(),
+			zero: true,
+		})
+
+		commands = append(commands, lipsumGenerator{
+			base:       NewBase("Lipsum - 1 Paragraph", "").withoutInputDisplay(),
+			paragraphs: 1,
+		})
+		commands = append(commands, lipsumGenerator{
+			base:       NewBase("Lipsum - 2 Paragraphs", "").withoutInputDisplay(),
+			paragraphs: 2,
+		})
+		commands = append(commands, lipsumGenerator{
+			base:       NewBase("Lipsum - 3 Paragraphs", "").withoutInputDisplay(),
+			paragraphs: 3,
+		})
+
 		return commands
 	}
 )
@@ -82,4 +114,40 @@ func (g secretGenerator) Exec(string) (string, error) {
 		ret[i] = letters[num.Int64()]
 	}
 	return string(ret), nil
+}
+
+type uuidGenerator struct {
+	base
+	// When set to true UUID4, otherwise UUID1
+	random bool
+	// When set to true will be all Zeros
+	zero bool
+}
+
+func (g uuidGenerator) Exec(string) (string, error) {
+	if g.zero {
+		return "00000000-0000-0000-0000-000000000000", nil
+	}
+	if g.random {
+		res, err := uuid.NewRandom()
+		return res.String(), err
+	} else {
+		res, err := uuid.NewUUID()
+		return res.String(), err
+	}
+}
+
+type lipsumGenerator struct {
+	base
+	paragraphs int
+}
+
+func (g lipsumGenerator) Exec(string) (string, error) {
+	var lipsum []string
+
+	for p := 0; p < g.paragraphs; p++ {
+		lipsum = append(lipsum, faker.Paragraph())
+	}
+
+	return strings.Join(lipsum, "\n\n"), nil
 }
