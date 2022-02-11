@@ -8,6 +8,7 @@ require (
 	github.com/charmbracelet/bubbletea v0.19.3
 	github.com/charmbracelet/lipgloss v0.4.0
 	github.com/ghodss/yaml v1.0.0
+	github.com/google/uuid v1.1.2
 	github.com/muesli/reflow v0.3.0
 	github.com/muesli/termenv v0.9.0
 	github.com/spf13/cobra v1.3.0

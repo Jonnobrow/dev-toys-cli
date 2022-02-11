@@ -9,6 +9,8 @@ import (
 	"encoding/hex"
 	"hash"
 	"math/big"
+
+	"github.com/google/uuid"
 )
 
 var (
@@ -50,6 +52,21 @@ var (
 			length: 64,
 		})
 
+		commands = append(commands, uuidGenerator{
+			base:   NewBase("UUID v1", "date-time and mac address").withoutInputDisplay(),
+			random: false,
+		})
+
+		commands = append(commands, uuidGenerator{
+			base:   NewBase("UUID v4", "randoms").withoutInputDisplay(),
+			random: false,
+		})
+
+		commands = append(commands, uuidGenerator{
+			base: NewBase("Nil UUID", "zero").withoutInputDisplay(),
+			zero: true,
+		})
+
 		return commands
 	}
 )
@@ -82,4 +99,25 @@ func (g secretGenerator) Exec(string) (string, error) {
 		ret[i] = letters[num.Int64()]
 	}
 	return string(ret), nil
+}
+
+type uuidGenerator struct {
+	base
+	// When set to true UUID4, otherwise UUID1
+	random bool
+	// When set to true will be all Zeros
+	zero bool
+}
+
+func (g uuidGenerator) Exec(string) (string, error) {
+	if g.zero {
+		return "00000000-0000-0000-0000-000000000000", nil
+	}
+	if g.random {
+		res, err := uuid.NewRandom()
+		return res.String(), err
+	} else {
+		res, err := uuid.NewUUID()
+		return res.String(), err
+	}
 }
