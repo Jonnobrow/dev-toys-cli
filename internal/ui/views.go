@@ -110,9 +110,5 @@ func (m Model) outputView() string {
 	if !m.Result.IsFromCommand(subcommand) {
 		return "Select to Run Command"
 	}
-	result, err := subcommand.Exec(m.getInput())
-	if err != nil {
-		return "Error running command"
-	}
-	return lipgloss.NewStyle().MaxHeight(20).Render(wrap.String(subcommand.DisplayOutput(result), m.width))
+	return lipgloss.NewStyle().MaxHeight(20).Render(wrap.String(subcommand.DisplayOutput(m.Result.Out()), m.width))
 }
