@@ -8,6 +8,27 @@ type Command interface {
 	ShouldDisplayInput() bool
 }
 
+type Result struct {
+	commandName string
+	result      string
+}
+
+func (r Result) IsFromCommand(cmd Command) bool {
+	return r.commandName == cmd.Name()
+}
+
+func (r Result) Command() string {
+	return r.commandName
+}
+
+func (r Result) Out() string {
+	return r.result
+}
+
+func NewResult(result string, commandName string) Result {
+	return Result{commandName, result}
+}
+
 type base struct {
 	name string
 	desc string

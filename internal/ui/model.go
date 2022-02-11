@@ -16,7 +16,7 @@ type Model struct {
 	keys keyMap
 	help help.Model
 	// Result of last operation
-	Result        string
+	Result        commands.Result
 	WriteToStdout bool
 	// Notification
 	notification string
@@ -95,13 +95,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.notification = fmt.Sprintf("Error: %s", err.Error())
 				} else {
 					m.notification = "Success"
-					m.Result = res
+					m.Result = commands.NewResult(res, cat.Selected().Name())
 				}
 			}
 		case key.Matches(msg, m.keys.Toggle):
 			m.clipboard = !m.clipboard
 		case key.Matches(msg, m.keys.Yank):
-			err := helpers.WriteToClipboard(m.Result)
+			err := helpers.WriteToClipboard(m.Result.Out())
 			if err != nil {
 				m.notification = "Failed to copy to clipboard"
 			} else {
