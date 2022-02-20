@@ -18,12 +18,10 @@ func (e ErrorMsg) Error() string {
 }
 
 func ReadFromStdin() tea.Msg {
-	info, err := os.Stdin.Stat()
+	hasStdin, err := HasStdin()
 	if err != nil {
-		return ErrorMsg{err}
-	}
-	if info.Mode()&os.ModeCharDevice == os.ModeCharDevice {
-		// No stdin available - not an error state thought
+		return ErrorMsg{err: err}
+	} else if !hasStdin {
 		return StdinMsg("")
 	}
 
@@ -39,4 +37,16 @@ func ReadFromStdin() tea.Msg {
 	}
 
 	return StdinMsg(strings.Join(output, "\n"))
+}
+
+func HasStdin() (bool, error) {
+	info, err := os.Stdin.Stat()
+	if err != nil {
+		return false, err
+	}
+	if info.Mode()&os.ModeCharDevice == os.ModeCharDevice {
+		// No stdin available - not an error state thought
+		return false, nil
+	}
+	return true, nil
 }

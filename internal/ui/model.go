@@ -35,27 +35,11 @@ type Model struct {
 
 func NewModel() Model {
 	return Model{
-		keys:     keys,
-		help:     help.New(),
-		title:    "dev-toys-cli",
-		subtitle: "a swiss army knife for developers",
-		categories: []*commands.Category{
-			// Converters
-			commands.NewCategory(
-				"Converters", "Convert Stuff",
-				commands.Converters()...,
-			),
-			// Formatters
-			commands.NewCategory(
-				"Formatters", "Format Stuff",
-				commands.Formatters()...,
-			),
-			// Generators
-			commands.NewCategory(
-				"Generators", "Generate Stuff",
-				commands.Generators()...,
-			),
-		},
+		keys:       keys,
+		help:       help.New(),
+		title:      "dev-toys-cli",
+		subtitle:   "a swiss army knife for developers",
+		categories: commands.Categories,
 		inCategory: false,
 	}
 }
