@@ -17,7 +17,7 @@ type Command interface {
 	ShouldDisplayInput() bool
 	CobraCommand(func(string) (string, error)) cobra.Command
 
-	cliName() string
+	toCliName() string
 }
 
 type Result struct {
@@ -47,14 +47,20 @@ type base struct {
 
 	displayInput  bool
 	displayOutput bool
+
+	cliName string
+	aliases []string
 }
 
 func (b base) Name() string {
 	return b.name
 }
 
-func (b base) cliName() string {
-	return strings.ToLower(strings.ReplaceAll(strings.ReplaceAll(b.name, " ", "-"), "->", ""))
+func (b base) toCliName() string {
+	if b.cliName != "" {
+		return b.cliName
+	}
+	return strings.ToLower(strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(b.name, " ", "-"), "->", ""), "--", "-"))
 }
 
 func (b base) Desc() string {
@@ -93,9 +99,25 @@ func (b base) withoutInputDisplay() base {
 	return newB
 }
 
+func (b base) withCliName(cliName string) base {
+	var newB base
+	newB = b
+	newB.cliName = cliName
+	return newB
+}
+
+func (b base) withAliases(aliases []string) base {
+	var newB base
+	newB = b
+	newB.aliases = aliases
+	return newB
+}
+
 func (b base) CobraCommand(Exec func(string) (string, error)) cobra.Command {
 	return cobra.Command{
-		Use: strings.ToLower(b.cliName()),
+		Use:     strings.ToLower(b.toCliName()),
+		Short:   b.desc,
+		Aliases: b.aliases,
 		Run: func(cmd *cobra.Command, args []string) {
 			var input string
 			hasStdin, err := helpers.HasStdin()

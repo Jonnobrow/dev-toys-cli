@@ -18,10 +18,10 @@ var (
 		var converters []Command
 		// YAML <> JSON
 		converters = append(converters, yamlToJson{
-			base: NewBase("YAML -> JSON", "Convert YAML to JSON"),
+			base: NewBase("YAML -> JSON", "Convert YAML to JSON").withAliases([]string{"y2j"}),
 		})
 		converters = append(converters, jsonToYaml{
-			base: NewBase("JSON -> YAML", "Convert JSON to YAML"),
+			base: NewBase("JSON -> YAML", "Convert JSON to YAML").withAliases([]string{"j2y"}),
 		})
 
 		// Number Base Converters
@@ -29,8 +29,10 @@ var (
 		for _, from := range bases {
 			for _, to := range bases {
 				if from != to {
+					prettyTo := toPrettyBase(to)
+					prettyFrom := toPrettyBase(from)
 					converters = append(converters, numberBaseConverter{
-						base:     NewBase(fmt.Sprintf("%s -> %s", toPrettyBase(from), toPrettyBase(to)), ""),
+						base:     NewBase(fmt.Sprintf("%s -> %s", prettyFrom, prettyTo), fmt.Sprintf("Convert %s to %s", prettyFrom, prettyTo)),
 						fromBase: from,
 						toBase:   to,
 					})
