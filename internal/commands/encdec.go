@@ -3,6 +3,7 @@ package commands
 import (
 	"encoding/base64"
 	"net/url"
+	"html"
 )
 
 var (
@@ -19,6 +20,12 @@ var (
 		})
 		converters = append(converters, urldec{
 			base: NewBase("URL Decode", "Decode input from url encoded"),
+		})
+		converters = append(converters, htmlenc{
+			base: NewBase("HTML Escape", "Encode input to HTML escape characters"),
+		})
+		converters = append(converters, htmldec{
+			base: NewBase("HTML Unescape", "Decode input from HTML escape characters"),
 		})
 		return converters
 	}
@@ -55,4 +62,20 @@ type urldec struct {
 
 func (e urldec) Exec(raw string) (string, error) {
 	return url.PathUnescape(raw)
+}
+
+type htmlenc struct { 
+	base 
+}
+
+func (e htmlenc) Exec(raw string) (string, error) {
+	return html.EscapeString(raw), nil
+}
+
+type htmldec struct { 
+	base 
+}
+
+func (e htmldec) Exec(raw string) (string, error) {
+	return html.UnescapeString(raw), nil
 }
