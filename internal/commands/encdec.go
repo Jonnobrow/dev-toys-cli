@@ -2,8 +2,11 @@ package commands
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"net/url"
 	"html"
+	"github.com/golang-jwt/jwt"
+	"fmt"
 )
 
 var (
@@ -26,6 +29,9 @@ var (
 		})
 		converters = append(converters, htmldec{
 			base: NewBase("HTML Unescape", "Decode input from HTML escape characters"),
+		})
+		converters = append(converters, jwtdec{
+			base: NewBase("JWT Decode", ""),
 		})
 		return converters
 	}
@@ -78,4 +84,32 @@ type htmldec struct {
 
 func (e htmldec) Exec(raw string) (string, error) {
 	return html.UnescapeString(raw), nil
+}
+
+type jwtdec struct {
+	base
+}
+
+func (e jwtdec) Exec(raw string) (string, error) {
+	token, _ := jwt.Parse(raw, nil)
+	if token == nil {
+		return "", fmt.Errorf("Failed parsing token")
+	}
+	headers, err := json.Marshal(token.Header)
+	if err != nil {
+		return "", err
+	}
+	claims, err := json.Marshal(token.Claims)
+	if err != nil {
+		return "", err
+	}
+	prettyHeaders, err := prettyJson(string(headers))
+	if err != nil {
+		return "", err
+	}
+	prettyClaims, err := prettyJson(string(claims))
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("Header:\n%s\n\nClaims:\n%s",prettyHeaders,prettyClaims), nil
 }
