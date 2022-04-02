@@ -55,6 +55,11 @@ func NewModel() Model {
 				"Generators", "Generate Stuff",
 				commands.Generators()...,
 			),
+			// Encoders and Decoders
+			commands.NewCategory(
+				"Encoders/Decoders", "Encode and Decode Stuff",
+				commands.EncodersDecoders()...,
+			),
 		},
 		inCategory: false,
 	}

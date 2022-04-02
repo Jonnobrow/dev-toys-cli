@@ -13,7 +13,7 @@ func Run() error {
 		return err
 	} else {
 		if m, ok := m.(ui.Model); ok && m.WriteToStdout {
-			fmt.Println(m.Result)
+			fmt.Println(m.Result.Out())
 		}
 	}
 	return nil
